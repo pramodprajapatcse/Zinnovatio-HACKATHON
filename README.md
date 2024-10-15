@@ -1,4 +1,4 @@
-# NextDoor - Community Alert App
+# NextDoor - Women Safety Alert App
 
 Welcome to NextDoor, a Community Alert App designed to keep you informed about important events and updates in your neighborhood. With NextDoor, you can post alerts and view alerts posted by others on a map, ensuring that you stay aware of what's happening around you.
 
@@ -20,7 +20,7 @@ To get started with NextDoor, follow these steps:
 
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/vi14m/NextDoor.git
+   git clone [https://github.com/pramodprajapatcse/Zinnovatio-HACKATHON/.git]
    ```
 ## Open the Project in Android Studio
 
