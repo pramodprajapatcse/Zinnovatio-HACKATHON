@@ -19,26 +19,39 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,112 +66,100 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun HomeScreen(navController: NavController, alertViewModel: AlertViewModel = hiltViewModel(), ) {
+fun HomeScreen(navController: NavController, alertViewModel: AlertViewModel = hiltViewModel()) {
+    val triggerWord by remember { mutableStateOf("") }
     val locationPermissionState = rememberMultiplePermissionsState(
         permissions = listOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.RECORD_AUDIO
         )
     )
-
-    val recentAlerts by alertViewModel.recentAlerts.observeAsState(emptyList())
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF2E1C1A))
-            .statusBarsPadding() // Add padding for status bar
-            .navigationBarsPadding() // Add padding for navigation bar
-            .padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        when {
-            locationPermissionState.allPermissionsGranted -> {
-                // Your normal HomeScreen content
-                Text(
-                    text = "Community Safety",
-                    color = Color.White,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(14.dp))
-                Text(
-                    text = "Welcome to Nextdoor!",
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = "The private social network for your neighborhood.",
-                    color = Color.Gray,
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                OptionItem(icon = Icons.Default.Notifications, title = "Alert Feed", description = "Be aware of local safety issues.")
-                OptionItem(icon = Icons.Default.AddCircle, title = "Post an alert", description = "Share information about a crime or suspicious activity.")
-                OptionItem(icon = Icons.Default.Person, title = "Profile", description = "Access your profile and settings.")
-                OptionItem(icon = Icons.Default.LocationOn, title = "Map View", description = "View all the alerts on a map.")
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Most recent alerts",
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 8.dp) // Add horizontal padding to separate from edges
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .background(Color(0xFF2E1C1A))
-                        .navigationBarsPadding()
-                        .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 58.dp) // Adjust bottom padding as needed
-                ) {
-                    recentAlerts.take(5).forEach { alert ->
-                        AlertItem(
-                            title = alert.title,
-                            description = alert.description,
-                            time = DateUtils.getRelativeTimeSpanString(alert.timestamp).toString()
-                        ) {
-                            navController.navigate("alertDetails/${alert.id}")
-                        }
-                    }
-                }
-            }
-            locationPermissionState.shouldShowRationale || !locationPermissionState.allPermissionsGranted -> {
-                // Show rationale or request permission
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Text(
-                        text = "Location permission is needed to show alerts location.",
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        textAlign = TextAlign.Center
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFEFB8C8)) // Background color for the screen
+                .statusBarsPadding() // Padding for status bar
+                .navigationBarsPadding() // Padding for the navigation bar
+                .padding(20.dp) // General padding for inner content
+        ) {
+            // Title Section
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+                    .padding(20.dp),
+                text = "COM ALERT",
+                fontSize = 28.sp,
+                fontFamily = FontFamily.Serif,
+                fontWeight = FontWeight.Bold,
+                style = TextStyle(
+                    shadow = Shadow(
+                        color = Color.Gray,
+                        offset = Offset(4f, 4f),
+                        blurRadius = 8f
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = { locationPermissionState.launchMultiplePermissionRequest() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
-                        shape = RoundedCornerShape(6.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F))
-                    ) {
-                        Text(text = "Grant Permission", color = Color.White, fontSize = 16.sp)
+                )
+            )
+            SectionCard(
+                title = "Trigger Word",
+                content = {
+                    TriggerWordSection { triggerWord ->
+                        alertViewModel.saveTriggerWord(triggerWord)
                     }
                 }
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Add Your Voice Section
+            SectionCard(
+                title = "Add Your Voice",
+                content = {
+                    AddYourVoiceSection(triggerWord) {
+                        // Handle voice trigger detection, e.g., send location to contacts
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Emergency Contacts Section
+            SectionCard(
+                title = "Emergency Contacts",
+                content = {
+                    EmergencyContactsSection { name, phone ->
+                        // Save emergency contact
+                       // alertViewModel.saveEmergencyContact(name, phone)
+                    }
+                }
+            )
+        }
+    }
+
+    @Composable
+    fun SectionCard(title: String, content: @Composable () -> Unit) {
+        // Section Card with rounded corners and shadow for visual appeal
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .shadow(8.dp, shape = RoundedCornerShape(12.dp)),
+            shape = RoundedCornerShape(12.dp),
+          //  backgroundColor = Color(0xFF4E342E), // Background color for each section
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp) // Padding inside the section card
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                content() // This is where the content (TriggerWordSection, AddYourVoiceSection, etc.) will be added
             }
         }
     }
-}
-
 
 
 
@@ -185,3 +186,105 @@ fun OptionItem(icon: ImageVector, title: String, description: String) {
         }
     }
 }
+@Composable
+fun TriggerWordSection(
+    onAddTriggerWord: (String) -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    var triggerWord by remember { mutableStateOf("") }
+
+    Column {
+        Button(
+            onClick = { showDialog = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Add Trigger Word")
+        }
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text("Add Trigger Word" )},
+                text = {
+                    TextField(
+                        value = triggerWord,
+                        onValueChange = { triggerWord = it },
+                        label = { Text("Trigger Word") }
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            onAddTriggerWord(triggerWord)
+                            showDialog = false
+                        }
+                    ) {
+                        Text("Save")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = { showDialog = false }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+    }
+}
+@Composable
+fun AddYourVoiceSection(
+    triggerWord: String,
+    onTriggerDetected: () -> Unit
+) {
+    // You will need to implement voice recognition logic
+    Text(text = "Add Your Voice", color = Color.White, fontSize = 16.sp)
+    // You can add a button to start listening for voice
+    Button(
+        onClick = {
+            // Start listening for voice and check if it matches the trigger word
+          //  if (/* logic to check voice against triggerWord */) {
+         //       onTriggerDetected() // Handle trigger detection (send location to contacts)
+        //    }
+        },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text("Start Voice Recognition")
+    }
+}
+@Composable
+fun EmergencyContactsSection(
+    onAddContact: (String, String) -> Unit // name and phone number
+) {
+    var name by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+
+    Column {
+        Text("Add Emergency Contact", color = Color.White, fontSize = 16.sp)
+        TextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Name") }
+        )
+        TextField(
+            value = phone,
+            onValueChange = { phone = it },
+            label = { Text("Phone Number") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+        )
+        Button(
+            onClick = {
+                onAddContact(name, phone)
+                name = ""
+                phone = ""
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Save Contact")
+        }
+    }
+}
+
+
+
