@@ -140,7 +140,7 @@ fun InfoSection(signOut: () -> Unit) {
                 fontSize = 18.sp
             )
             Text(
-                text = "Jhon Doe",
+                text = "Next Door",
                 color = Color.LightGray,
                 fontSize = 18.sp
             )
@@ -157,7 +157,7 @@ fun InfoSection(signOut: () -> Unit) {
                 fontSize = 18.sp
             )
             Text(
-                text = "JohnDoe1212",
+                text = "nextdoor1212",
                 color = Color.LightGray,
                 fontSize = 18.sp
             )
@@ -174,7 +174,7 @@ fun InfoSection(signOut: () -> Unit) {
                 fontSize = 18.sp
             )
             Text(
-                text = "jhondoe1212@gmail.com",
+                text = "nextdoor1212@gmail.com",
                 color = Color.LightGray,
                 fontSize = 18.sp
             )
@@ -207,17 +207,5 @@ fun InfoSection(signOut: () -> Unit) {
             }
 
         }
-
     }
-}
-
-@Composable
-fun MyPostSection(){
-
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun ProfileScreenPreview() {
-
 }

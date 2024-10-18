@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,6 +45,7 @@ import com.example.comalert.viewModel.AuthViewModel
 import com.example.comalert.presentation.AlertDetailsScreen
 import com.example.comalert.presentation.AlertScreen
 import com.example.comalert.presentation.Auth.LogInScreen
+import com.example.comalert.presentation.Auth.OtpScreen
 import com.example.comalert.presentation.Auth.SignUpScreen
 import com.example.comalert.presentation.HomeScreen
 import com.example.comalert.presentation.MapScreen
@@ -78,7 +80,7 @@ fun NextDoorApp() {
     val alertViewModel: AlertViewModel = hiltViewModel()
     val authViewModel: AuthViewModel = hiltViewModel()
     val authState by authViewModel.authState.observeAsState()
-    var selected by remember { mutableStateOf(0) }
+    var selected by remember { mutableIntStateOf(0) }
     Scaffold(
         bottomBar = {
             if (authState is AuthState.Authenticated) {
@@ -137,10 +139,17 @@ fun CentralNavHost(
         navController = navController,
         startDestination = if (authState is AuthState.Authenticated) "main" else "auth"
     ) {
+        // Authentication flow
         navigation(startDestination = "login", route = "auth") {
             composable("login") { LogInScreen(navController, authViewModel) }
             composable("signup") { SignUpScreen(navController, authViewModel) }
+            composable("otp/{verificationId}") { backStackEntry ->
+                val verificationId = backStackEntry.arguments?.getString("verificationId") ?: ""
+                OtpScreen(navController, authViewModel, verificationId) // OTP Screen composable
+            }
         }
+
+        // Main flow
         navigation(startDestination = "home", route = "main") {
             composable("home") { HomeScreen(navController, alertViewModel) }
             composable("alerts") { AlertScreen(navController, alertViewModel) }
@@ -154,6 +163,7 @@ fun CentralNavHost(
         }
     }
 }
+
 
 
 val bottomNavItems = listOf(

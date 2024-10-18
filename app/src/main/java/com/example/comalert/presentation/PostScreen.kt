@@ -190,25 +190,24 @@ fun PostAlertScreen(navController: NavController, alertViewModel: AlertViewModel
             UrgencyLevelOption("Medium", urgencyLevel) { urgencyLevel = it }
             UrgencyLevelOption("High", urgencyLevel) { urgencyLevel = it }
             Spacer(modifier = Modifier.height(16.dp))
-//            Row(
-//                verticalAlignment = Alignment.CenterVertically,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//            ) {
-//                Text("Location", color = Color.White, fontWeight = FontWeight.Bold)
-//                Spacer(modifier = Modifier.weight(1f))
-//                Icon(
-//                    imageVector = Icons.Default.LocationOn,
-//                    contentDescription = "Select location",
-//                    tint = Color.White,
-//                    modifier = Modifier.clickable {
-//                        val gmmIntentUri = Uri.parse("geo:0,0?q=locate")
-//                        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-//                        mapIntent.setPackage("com.google.android.apps.maps")
-//                        context.startActivity(mapIntent)
-//                    }
-//                )
-//            }
+            Row(
+               verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                   .fillMaxWidth()
+            ) {
+               Text("Location", color = Color.White, fontWeight = FontWeight.Bold)
+               Spacer(modifier = Modifier.weight(1f))
+               Icon(
+                   imageVector = Icons.Default.LocationOn,
+                    contentDescription = "Select location",
+                   tint = Color.White,
+                    modifier = Modifier.clickable {
+                        val gmmIntentUri = Uri.parse("geo:0,0?q=locate")
+                        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                        mapIntent.setPackage("com.google.android.apps.maps")
+                        context.startActivity(mapIntent)
+                    }
+                )            }
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
